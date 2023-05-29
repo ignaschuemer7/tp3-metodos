@@ -35,7 +35,7 @@ plt.show()
 # de una muestra a cada centroide.
 
 reduced_data = PCA(n_components=2).fit_transform(X)
-kmeans = KMeans(init='k-means++', n_clusters=10, n_init=10)
+kmeans = KMeans(init='k-means++', n_clusters=2, n_init=10)
 kmeans.fit(reduced_data)
 h = .02
 x_min, x_max = reduced_data[:, 0].min() - 1, reduced_data[:, 0].max() + 1
