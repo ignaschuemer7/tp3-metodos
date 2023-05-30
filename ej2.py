@@ -33,8 +33,8 @@ plt.show()
 # Determinar a que cluster pertenece cada muestra xi
 # Encontrar en centroide de cada cluster y a partir de estos, armar una clasificador basado en la distancia
 # de una muestra a cada centroide.
-
-reduced_data = PCA(n_components=2).fit_transform(X)
+n=2
+reduced_data = PCA(n_components=n).fit_transform(X)
 kmeans = KMeans(init='k-means++', n_clusters=2, n_init=10)
 kmeans.fit(reduced_data)
 h = .02

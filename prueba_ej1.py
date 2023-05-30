@@ -36,10 +36,11 @@ for nombre_archivo in os.listdir(directorio):
 # Imprimir el número de imágenes procesadas
 print(f'Se importaron {len(matrices_Imagenes)} imágenes.')
 # Obtener el tamaño de la matriz de una Imagen
-m = matrices_Imagenes[0].shape[0]
+p = matrices_Imagenes[0].shape[0]
 
+plt.imshow(matrices_Imagenes[0], cmap='gray')
 # Matriz que almacenará los vectores de cada Imagen
-matriz_columnas = np.empty((m * m, len(matrices_Imagenes)))
+matriz_columnas = np.empty((p * p, len(matrices_Imagenes)))
 
 # Recorrer las matrices de las imágenes
 for i, matriz_Imagen in enumerate(matrices_Imagenes):
@@ -53,20 +54,25 @@ for i, matriz_Imagen in enumerate(matrices_Imagenes):
 print(matriz_columnas.shape)
 
 # Calcular la descomposición en valores singulares
-U, S, Vt = np.linalg.svd(matriz_columnas, full_matrices=False)
 
-# Imprimir las dimensiones de las matrices resultantes
-first_dimension = U[:, 0].reshape(m , m)
-last_dimension = U[:, -1].reshape(m , m)
+U, S, Vt = np.linalg.svd(matriz_columnas, full_matrices=True)
+
+# Visualizar en forma matricial p×p las primeras y las últimas dimensiones (autovectores) de la descomposición
+# obtenida. ¿Qué diferencias existen entre unas y otras? ¿Qué conclusiones pueden sacar?
+first_dimension = (U[:, 0]@np.diag(S)[0,0]@Vt[0, :]).reshape(p, p)
+
 
 # Visualizar las primeras y últimas dimensiones
 
-# printear la Imagen resultante
-# plt.imshow(first_dimension, cmap='gray')
-# plt.show()
+# printear la Imagen resultante en una misma figura
+fig, axs = plt.subplots(1, 2)   
+axs[0].imshow(first_dimension, cmap='gray')
+axs[0].set_title('Primera dimensión')
+axs[1].imshow(last_dimension, cmap='gray')
+axs[1].set_title('Última dimensión')
+#guardar la figura como svg 
+plt.savefig('Primera_ultima_dimension.svg', format="svg")
 
-# plt.imshow(last_dimension, cmap='gray')
-# plt.show()
 
 
 """
