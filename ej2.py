@@ -1,4 +1,4 @@
-
+#%%
 """
 En el archivo dataset_clusters.csv se encuentra el dataset X. Este contiene un conjunto de n muestras
 {x1, x2, . . . , xi, . . . , xn}
@@ -25,9 +25,12 @@ def calcular_matriz_de_similaridades(X, sigma):
     # Calcular la matriz de distancias
     n = X.shape[0]
     matriz_sim = np.zeros((n,n))
+    #como la matriz es simetrica, solo calculamos la mitad
     for i in range(n):
-        for j in range(n):
-            matriz_sim[i,j] = np.exp(-np.linalg.norm(X[i,:] - X[j,:])**2/(2*sigma**2))
+        for j in range(i+1, n):
+            matriz_sim[i,j] = np.exp(-np.linalg.norm(X[i,:]-X[j,:])**2/(2*sigma**2))
+    #completamos la matriz
+    matriz_sim = matriz_sim + matriz_sim.T
     return matriz_sim
 
 # Calcular la matriz de grados
@@ -60,10 +63,10 @@ def PCA(X, n):
 
 def find_clusters(X, n_clusters):
     """
-    Calcula los clusters a los que pertenece cada muestra de un dataset X
+    Calcula los clusters a los que pertenece cada muestra de un dataset X_proyectado en un espacio de menor dimension
     """
     # Calcular la matriz de similaridades
-    matriz_similaridades = calcular_matriz_de_similaridades(X, 1)
+    matriz_similaridades = calcular_matriz_de_similaridades(X, 0.23)
     # Calcular la matriz de grados
     matriz_grados = calcular_matriz_grados(matriz_similaridades)
     # Calcular la matriz laplaciana
@@ -76,7 +79,9 @@ def find_clusters(X, n_clusters):
     autovectores = autovectores[:,:n_clusters]
     # # Calcular la matriz de datos proyectada en el espacio de menor dimension
     # X_proyectado = PCA(X, n_clusters)         
-    # Calcular los clusters a los que pertenece cada muestra
+    # Calcular los clusters a los que pertenece cada muestra, usando la matriz de similaridades que
+    #contieene la informacion de la similaridad entre cada par de muestras
+    
     clusters = np.zeros((X.shape[0], n_clusters))
     for i in range(X.shape[0]):
         for j in range(n_clusters):
@@ -84,13 +89,29 @@ def find_clusters(X, n_clusters):
         clusters[i,:] = np.argsort(clusters[i,:])
     return clusters
 
-# Cargar el dataset
+    
+
+# # Cargar el dataset
 X = np.loadtxt('dataset_clusters.csv', delimiter=',')
 print(X.shape)
+# # Visualizar el dataset	
+# plt.scatter(X[:, 0], X[:, 1])
+# plt.show()
 
-# Visualizar el dataset	
-plt.scatter(X[:, 0], X[:, 1])
-plt.show()
+# #reduccion de dimensiones a 2 por medio de svd
+# U, S, V = np.linalg.svd(X)
+# X_reducido = U[:,:2]
+# print(X_reducido.shape)
+# plt.scatter(X_reducido[:, 0], X_reducido[:, 1])
+# plt.show()
+
+# #reduccion de dimensiones a 3 por medio de svd
+# X_reducido = U[:,:3]
+# print(X_reducido.shape)
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# ax.scatter(X_reducido[:, 0], X_reducido[:, 1], X_reducido[:, 2])
+# plt.show()
 
 # determinar si existen clusters o grupos de alta similaridad entre muestras en el dataset.
 # Determinar a que cluster pertenece cada muestra xi
@@ -99,12 +120,16 @@ plt.show()
 #mostrar el dataset proyectado en el espacio de menor dimension, dimension 2
 
 X_proyectado = PCA(X, 2)
-print(X_proyectado.shape)
-plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1])
-plt.show()
+# print(X_proyectado.shape)
+# plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1])
+# plt.show()
 #mostrar los clusters en dimension 2(tarda)
 clusters = find_clusters(X_proyectado, 2)
-plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1], c=clusters[:,0]) 
+#corregir los clusters para que los puntos mas cercanos al centroide sean los del cluster cprrrespondiente
+#y los mas lejanos los del otro cluster
+#teniendo en cuenta la distancia de cada punto a cada centroide
+
+plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1], c=clusters[:,0])
 #calcular el centroide de cada cluster
 centroide1 = np.mean(X_proyectado[clusters[:,0]==0,:], axis=0)  
 centroide2 = np.mean(X_proyectado[clusters[:,0]==1,:], axis=0)
