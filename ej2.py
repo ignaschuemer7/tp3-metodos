@@ -67,21 +67,33 @@ def find_clusters(X, n_clusters):
     """
     # Calcular la matriz de similaridades
     matriz_similaridades = calcular_matriz_de_similaridades(X, 0.23)
+    #imprimir la matriz de similaridades
+    plt.imshow(matriz_similaridades)
+    #agregar leyendas a los ejes
+    plt.xlabel('Muestras')
+    plt.ylabel('Muestras')
+    plt.colorbar()
+    plt.show()
     # Calcular la matriz de grados
     matriz_grados = calcular_matriz_grados(matriz_similaridades)
     # Calcular la matriz laplaciana
     matriz_laplaciana = matriz_grados - matriz_similaridades    
+    #normalizamos la matriz laplaciana
+    matriz_laplaciana = matriz_laplaciana/np.linalg.norm(matriz_laplaciana)
+    #descomposicion en valores singulares para obtener los autovectores de la matriz laplaciana normalizada
+    U, S, V = np.linalg.svd(matriz_laplaciana)
+    #seleccionamos los n autovectores correspondientes a los n autovalores mas grandes
+    autovectores = U[:,:n_clusters]
+    #normalizamos los autovectores
+    autovectores = autovectores/np.linalg.norm(autovectores)
+
     # Calcular los n autovectores correspondientes a los n autovalores mas grandes
-    autovalores, autovectores = np.linalg.eig(matriz_laplaciana)
-    idx = autovalores.argsort()[::-1]   
-    autovalores = autovalores[idx]
-    autovectores = autovectores[:,idx]  
-    autovectores = autovectores[:,:n_clusters]
-    # # Calcular la matriz de datos proyectada en el espacio de menor dimension
-    # X_proyectado = PCA(X, n_clusters)         
-    # Calcular los clusters a los que pertenece cada muestra, usando la matriz de similaridades que
-    #contieene la informacion de la similaridad entre cada par de muestras
-    
+    # autovalores, autovectores = np.linalg.eig(matriz_laplaciana)
+    # idx = autovalores.argsort()[::-1]   
+    # autovalores = autovalores[idx]
+    # autovectores = autovectores[:,idx]  
+    # autovectores = autovectores[:,:n_clusters]  
+
     clusters = np.zeros((X.shape[0], n_clusters))
     for i in range(X.shape[0]):
         for j in range(n_clusters):
@@ -130,7 +142,7 @@ clusters = find_clusters(X_proyectado, 2)
 #teniendo en cuenta la distancia de cada punto a cada centroide
 
 plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1], c=clusters[:,0])
-#calcular el centroide de cada cluster
+# calcular el centroide de cada cluster
 centroide1 = np.mean(X_proyectado[clusters[:,0]==0,:], axis=0)  
 centroide2 = np.mean(X_proyectado[clusters[:,0]==1,:], axis=0)
 plt.scatter(centroide1[0], centroide1[1], c='r', marker='x', s=100)
