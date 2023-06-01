@@ -54,24 +54,17 @@ U, S, Vt = np.linalg.svd(matrices_Imagenes, full_matrices=True)
 # Visualizar en forma matricial p×p las primeras y las últimas dimensiones (autovectores) de la descomposición
 # obtenida. ¿Qué diferencias existen entre unas y otras? ¿Qué conclusiones pueden sacar?
 #tomamos k autovectores
-k = 10
-#primeros 10 autovectores
-U_10 = U[:,:k]
-Vt_10 = Vt[:k,:]
-#ultimos 10 autovectores
-U_ultimos_10 = U[:,-k:]
-Vt_ultimos_10 = Vt[-k:,:]
+k = 1
+#primeros autovectores
+first = U[:,:k]
+#ultimos autovectores
+last = U[:,-k:]
 
-#reconstruir la matriz de datos con los primeros 10 autovectores
-matriz_Imagenes_10 = U_10 @ np.diag(S[:k]) @ Vt_10
-#reconstruir la matriz de datos con los ultimos 10 autovectores
-matriz_Imagenes_ultimos_10 = U_ultimos_10 @ np.diag(S[-k:]) @ Vt_ultimos_10
-
-#mostrar la matriz A con matplot
+#mostrar los primeros k autovectores y los ultimos k autovectores
 fig, axs = plt.subplots(1,2)
-axs[0].imshow(matriz_Imagenes_10, cmap='gray')
+axs[0].imshow(first.reshape(p,p), cmap='gray')
 axs[0].set_title(f'primeros {str(k)} autovectores')
-axs[1].imshow(matriz_Imagenes_ultimos_10, cmap='gray')
+axs[1].imshow(last.reshape(p,p), cmap='gray')
 axs[1].set_title(f'ultimos {str(k)} autovectores')
 plt.show()
 

@@ -18,30 +18,17 @@ plt.rcParams['font.family'] = 'serif'
 plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
 
 # Calcular la matriz de distancias
-def calcular_matriz_distancias(X):
-    """
-    Calcula la matriz de distancias de un dataset X
-    """
-    # Calcular la matriz de distancias
-    n = X.shape[0]
-    matriz_distancias = np.zeros((n,n))
-    for i in range(n):
-        for j in range(n):
-            matriz_distancias[i,j] = np.linalg.norm(X[i,:] - X[j,:])
-            # print(f'Calculando distancia entre {i} y {j}')
-            # print(f'Distancia: {matriz_distancias[i,j]}')
-    return matriz_distancias
-
-# Calcular la matriz de similaridades
-def calcular_matriz_similaridades(X, sigma):
+def calcular_matriz_de_similaridades(X, sigma):
     """
     Calcula la matriz de similaridades de un dataset X
     """
     # Calcular la matriz de distancias
-    matriz_distancias = calcular_matriz_distancias(X)
-    # Calcular la matriz de similaridades
-    matriz_similaridades = np.exp(-matriz_distancias**2/(2*sigma**2))
-    return matriz_similaridades
+    n = X.shape[0]
+    matriz_sim = np.zeros((n,n))
+    for i in range(n):
+        for j in range(n):
+            matriz_sim[i,j] = np.exp(-np.linalg.norm(X[i,:] - X[j,:])**2/(2*sigma**2))
+    return matriz_sim
 
 # Calcular la matriz de grados
 def calcular_matriz_grados(matriz_similaridades):
@@ -76,24 +63,24 @@ def find_clusters(X, n_clusters):
     Calcula los clusters a los que pertenece cada muestra de un dataset X
     """
     # Calcular la matriz de similaridades
-    matriz_similaridades = calcular_matriz_similaridades(X, sigma=1)
+    matriz_similaridades = calcular_matriz_de_similaridades(X, 1)
     # Calcular la matriz de grados
     matriz_grados = calcular_matriz_grados(matriz_similaridades)
     # Calcular la matriz laplaciana
-    matriz_laplaciana = matriz_grados - matriz_similaridades
+    matriz_laplaciana = matriz_grados - matriz_similaridades    
     # Calcular los n autovectores correspondientes a los n autovalores mas grandes
     autovalores, autovectores = np.linalg.eig(matriz_laplaciana)
     idx = autovalores.argsort()[::-1]   
     autovalores = autovalores[idx]
-    autovectores = autovectores[:,idx]
+    autovectores = autovectores[:,idx]  
     autovectores = autovectores[:,:n_clusters]
-    # Calcular la matriz de datos proyectada en el espacio de menor dimension
-    X_proyectado = PCA(X, n_clusters)
+    # # Calcular la matriz de datos proyectada en el espacio de menor dimension
+    # X_proyectado = PCA(X, n_clusters)         
     # Calcular los clusters a los que pertenece cada muestra
     clusters = np.zeros((X.shape[0], n_clusters))
     for i in range(X.shape[0]):
         for j in range(n_clusters):
-            clusters[i,j] = np.linalg.norm(X_proyectado[i,:] - autovectores[j,:])
+            clusters[i,j] = np.linalg.norm(X[i,:] - autovectores[j,:])
         clusters[i,:] = np.argsort(clusters[i,:])
     return clusters
 
@@ -117,7 +104,12 @@ plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1])
 plt.show()
 #mostrar los clusters en dimension 2(tarda)
 clusters = find_clusters(X_proyectado, 2)
-plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1], c=clusters[:,0])    
+plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1], c=clusters[:,0]) 
+#calcular el centroide de cada cluster
+centroide1 = np.mean(X_proyectado[clusters[:,0]==0,:], axis=0)  
+centroide2 = np.mean(X_proyectado[clusters[:,0]==1,:], axis=0)
+plt.scatter(centroide1[0], centroide1[1], c='r', marker='x', s=100)
+plt.scatter(centroide2[0], centroide2[1], c='r', marker='x', s=100) 
 plt.show()
 
 #mostrar el dataset proyectado en el espacio de menor dimension, dimension 3
@@ -126,6 +118,9 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.scatter(X_proyectado[:, 0], X_proyectado[:, 1], X_proyectado[:, 2])
 plt.show()
+
+
+#mostrar los clusters en dimension 2(tarda)
 
 
 #%%
