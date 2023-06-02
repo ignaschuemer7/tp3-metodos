@@ -1,23 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
-def PCA(X, n):
-    """
-    Calcula la matriz de proyeccion de los datos a un espacio de menor dimension mediante el metodo de componentes principales
-    """
-    # Calcular la matriz de covarianza
-    covarianza = np.cov(X.T)
-    # Calcular los autovalores y autovectores
-    autovalores, autovectores = np.linalg.eig(covarianza)
-    # Ordenar los autovectores segun los autovalores
-    idx = autovalores.argsort()[::-1]   
-    autovalores = autovalores[idx]
-    autovectores = autovectores[:,idx]
-    # Seleccionar los n autovectores correspondientes a los n autovalores mas grandes
-    autovectores = autovectores[:,:n]
-    # Proyectar los datos en el nuevo espacio
-    X_proyectado = X @ autovectores
-    return X_proyectado
+from ej2 import *
 
 # Calcular la matriz de distancias
 def calcular_matriz_de_distancias(X):
@@ -74,24 +57,28 @@ def dbscan(X, epsilon, min_muestras):
     
     return cluster
 
-# Cargar el dataset
-X_original = np.loadtxt('dataset_clusters.csv', delimiter=',')
-X = PCA(X_original,2)
+def main():
+    # Cargar el dataset
+    X_original = np.loadtxt('dataset_clusters.csv', delimiter=',')
+    X = PCA(X_original,2)
 
-# Visualizar el dataset	
-plt.scatter(X[:, 0], X[:, 1])
-plt.show()
+    # Visualizar el dataset	
+    plt.scatter(X[:, 0], X[:, 1])
+    plt.show()
 
-# Parámetros de DBSCAN
-epsilon = 0.67
-min_muestras = 10
+    # Parámetros de DBSCAN
+    epsilon = 0.67
+    min_muestras = 10
 
-# Realizar el clustering con DBSCAN
-labels = dbscan(X, epsilon, min_muestras)
+    # Realizar el clustering con DBSCAN
+    labels = dbscan(X, epsilon, min_muestras)
 
-# Graficar los clusters
-plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis')
-plt.title('Clustering')
-plt.xlabel('Eje X')
-plt.ylabel('Eje Y')
-plt.show()
+    # Graficar los clusters
+    plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis')
+    plt.title('Clustering')
+    plt.xlabel('Eje X')
+    plt.ylabel('Eje Y')
+    plt.show()
+
+if __name__ == "__main__":
+    main()
