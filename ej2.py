@@ -1,19 +1,5 @@
-"""
-En el archivo dataset_clusters.csv se encuentra el dataset X. Este contiene un conjunto de n muestras
-{x1, x2, . . . , xi, . . . , xn}
-con xi ∈ Rp (X es por lo tanto una matriz de n×p dimensiones). Si bien el conjunto tiene, a priori, dimensión
-alta, suponemos que las muestras no se distribuyen uniformemente, por lo que podremos encontrar grupos
-de muestras (clusters) similares entre sí. La similaridad entre un par de muestras xi, xj se puede medir
-utilizando una función no-lineal de su distancia euclidiana:
-para algún valor de σ.
-1. Determinar si existen clusters o grupos de alta similaridad entre muestras en el dataset.
-2. Determinar a que cluster pertenece cada muestra xi
-3. Encontrar en centroide de cada cluster y a partir de estos, armar una clasificador basado en la distancia
-de una muestra a cada centroide.
-"""
 import numpy as np
 import matplotlib.pyplot as plt
-from ej2Clasificador import *
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
 
@@ -101,6 +87,16 @@ def show_matrix(A, title):
     plt.title(title)
     plt.show()
 
+def show_clustering_data(X, clusters, centroids, title='Clustering'):
+    for i in range(1, int(np.max(clusters))):
+        plt.scatter(X[clusters == i+1, 0], X[clusters == i+1, 1], label=f'Cluster {i}')
+        plt.scatter(centroids[i-1, 0], centroids[i-1, 1], marker='X', color='black', label=f'Centroide {i}')
+    plt.title(title)
+    plt.legend(loc='best')
+    plt.xlim(-3.5, 3.5)
+    plt.ylim(-3.5, 5)
+    plt.show()
+
 def find_centroids(cluster):
     """
     Calcula el centriode de un cluster
@@ -119,9 +115,14 @@ def main():
     # reduccion de dimensiones a 2 por medio de pca
     X_proyectado = PCA(X, 2)
     # print(X_proyectado.shape)
+    plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1])
+    plt.show()
+
+    #usar Vt de la descomposicion en valores singulares para reducir la dimension de los datos, para hacer PCA
+    # U, S, Vt = np.linalg.svd(X)
+    # X_proyectado = X @ Vt[:2,:].T
     # plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1])
     # plt.show()
-
     #visualizar la matriz de similaridades 
     # matriz_similaridades = calcular_matriz_de_similaridades(X_proyectado, 0.23)
     # show_matrix(matriz_similaridades, 'Matriz de similaridades')
@@ -133,9 +134,12 @@ def main():
     #teniendo en cuenta la distancia de cada punto a cada centroide
 
     plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1], c=clusters[:,0])
-    # calcular el centroide de cada cluster
+    # # calcular el centroide de cada cluster
     centroide1 = find_centroids(X_proyectado[clusters[:,0]==0,:])
     centroide2 = find_centroids(X_proyectado[clusters[:,0]==1,:])
+    # show_clustering_data(X_proyectado, clusters[:,0], np.array([centroide1, centroide2]), 'Clustering con k-means')
+    print(centroide1)
+    print(centroide2)
     plt.scatter(centroide1[0], centroide1[1], c='r', marker='x', s=100)
     plt.scatter(centroide2[0], centroide2[1], c='r', marker='x', s=100) 
     plt.show()
@@ -168,8 +172,8 @@ def main():
 if __name__ == "__main__":
     main()
 
-#mostrar los clusters en dimension 2(tarda)
-
+# #mostrar los clusters en dimension 2(tarda)
+# #%%
 
 # """
 # En el archivo dataset_clusters.csv se encuentra el dataset X. Este contiene un conjunto de n muestras
@@ -222,3 +226,5 @@ if __name__ == "__main__":
 # plt.xticks(())
 # plt.yticks(())
 # plt.show()
+
+# # %%
