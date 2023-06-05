@@ -95,6 +95,7 @@ def show_clustering_data(X, clusters, centroids, title='Clustering'):
     plt.legend(loc='best')
     plt.xlim(-3.5, 3.5)
     plt.ylim(-3.5, 5)
+    plt.savefig(f'{title}.svg', format='svg')
     plt.show()
 
 def find_centroids(cluster):

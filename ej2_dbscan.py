@@ -85,7 +85,7 @@ def main():
     #     centroids.append(np.mean(X[dbscan_data == i+1], axis=0))
     # centroids = np.array(centroids)
 
-    # show_clustering_data(X, dbscan_data, centroids, title='DBSCAN')
+    # show_clustering_data(X, dbscan_data, centroids, title='DBSCAN 2D')
     # distance_clasificator = find_subsets(X, centroids)
     # show_clustering_data(X, distance_clasificator, centroids, title='Clasificador de datos por distancia a centroides')
 
@@ -99,7 +99,7 @@ def main():
     # ax.scatter(X_3d[:, 0], X_3d[:, 1], X_3d[:, 2])
     # plt.show()
 
-    # # Parámetros de DBSCAN para 3 dimensiones
+    # Parámetros de DBSCAN para 3 dimensiones
     # epsilon_3d = 1.04
     # min_muestras_3d = 10
 
@@ -117,23 +117,24 @@ def main():
     # plt.show()
 
     # Parámetros de DBSCAN para 4 dimensiones, luego hacemos un histograma para ver la distribución de los clusters	
-    # epsilon_4d = 1.04
-    # min_muestras_4d = 10
-    # X_4d = PCA(X_original, 4)
-    # # Realizar el clustering con DBSCAN para 4 dimensiones
-    # labels_4d = dbscan(X_4d, epsilon_4d, min_muestras_4d)
-    # print(np.max(labels_4d))
-    # # Graficar los histogramas para poder visualisar aglomeramiento de datos, no podemos verlo en 4 dimensiones por eso hacemos un histograma
-    # #graficar los histogramas de los clusters en una misma imagen
-    # plt.figure()
-    # for i in range(1, np.max(labels_4d)):
-    #     plt.hist(X_4d[labels_4d == i+1, 0], bins=20, alpha=0.5)  
-    # plt.title('Histograma de la primera componente de los datos agrupados por clusters')
-    # plt.xlabel('Componente 1')
-    # plt.ylabel('Densidad de puntos')
-    # plt.show()
+    epsilon_4d = 1.04
+    min_muestras_4d = 10
+    X_4d = PCA(X_original, 4)
+    # Realizar el clustering con DBSCAN para 4 dimensiones
+    labels_4d = dbscan(X_4d, epsilon_4d, min_muestras_4d)
+    print(np.max(labels_4d))
+    # Graficar los histogramas para poder visualisar aglomeramiento de datos, no podemos verlo en 4 dimensiones por eso hacemos un histograma
+    #graficar los histogramas de los clusters en una misma imagen
+    plt.figure()
+    for i in range(1, np.max(labels_4d)):
+        plt.hist(X_4d[labels_4d == i+1, 0], bins=20, alpha=0.5)  
+    plt.title('Densidad de la primera componente de los datos agrupados por clusters')
+    plt.xlabel('Componente 1')
+    plt.ylabel('Densidad de puntos')
+    plt.savefig('histograma_clusters.svg', format='svg')
+    plt.show()
 
-    # #printear el histograma de la primer componente luego de hacer el pca sin la mascara
+    #printear el histograma de la primer componente luego de hacer el pca sin la mascara
     # plt.figure()
     # plt.hist(X_4d[:, 0], bins=20)
     # plt.title('Histograma de la primera componente de los datos')

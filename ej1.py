@@ -62,23 +62,19 @@ def show_first_eigenvec_and_s(U,S, p, save = False):
             #sacar los ejes de la imagen
             axs[i,j].axis('off')
             fig.tight_layout()
+    fig.colorbar(axs[3,3].imshow(U[:,15].reshape(p,p), cmap='gray'), ax=axs, orientation='vertical', fraction=.1)
     if save:
         plt.savefig('primeros_16_autovectores.svg', format="svg")
     plt.show()
-    #mostrar S en un grafico de barras
-    #que el tamaño de la imagen sea igual de grande que el grafico de los autovectores
-
-    plt.bar(range(1, len(S)+1), S, color='gray')
+    plt.bar(range(1, len(S)+1), S, color='purple')
     plt.xticks(range(0, len(S)+1))
     plt.xlabel('i') 
-    plt.ylabel(r'$\sigma_i$')
+    plt.ylabel(r'$\sigma_i$')   
     plt.title(r'Valores singulares distintos de cero $\sigma_i$')
     if save:
         plt.savefig('S.svg', format="svg")
 
-    plt.show()
-    
-    
+    plt.show()    
 
 def find_d(U, S, Vt, Imagen, error):
     norma_frobenius = np.linalg.norm(Imagen, ord='fro')
@@ -118,7 +114,7 @@ def punto_1_2(matrices_Imagenes, p, k):
     axs[0,0].imshow(Imagen, cmap='gray')
     axs[0,0].set_title('Imagen original')
     axs[0,1].imshow(Imagen_reconstruida, cmap='gray', label='Imagen reconstruida')
-    axs[0,1].set_title('D = ' + str(d) +', error = ' + str(error)[:5])
+    axs[0,1].set_title('d = ' + str(d) +', error = ' + str(error)[:5])
     #sacar los ejes de la imagen
     axs[0,0].axis('off')
     axs[0,1].axis('off')
@@ -153,7 +149,7 @@ def punto_1_2(matrices_Imagenes, p, k):
     axs[1,0].axis('off')
 
     axs[1,1].imshow(Imagen_reconstruida, cmap='gray')
-    axs[1,1].set_title('D = ' + str(d) +', error = ' + str(error)[:5])
+    axs[1,1].set_title('d = ' + str(d) +', error = ' + str(error)[:5])
     #sacar los ejes de la imagen
     axs[1,1].axis('off')
     fig.tight_layout()
@@ -181,17 +177,18 @@ def punto_1_2(matrices_Imagenes, p, k):
     img = [2, 3, 5, 6]
 
     #primero mostramos en una figura las imagenes originales
-    fig, axs = plt.subplots(2,2)
+    fig, axs = plt.subplots(4,1)
     for i in range(len(img)):
         Imagen = matrices_Imagenes[:,img[i]].reshape(p,p)
-        axs[i//2,i%2].imshow(Imagen, cmap='gray')
-        axs[i//2,i%2].axis('off')
-        axs[i//2,i%2].set_title('Imagen ' + str(i+1))
+        axs[i].imshow(Imagen, cmap='gray')
+        axs[i].axis('off')
+        axs[i].set_title('Imagen ' + str(i+1))
+    fig.tight_layout()
     plt.savefig('ImagenesOriginales.svg', format="svg")
     plt.show()
 
     #calculamos el error para cada imagen y para cada d
-    d = np.arange(1, 28, 1)
+    d = np.arange(1, 16, 1)
     error = np.zeros((d.shape[0], len(img)))
     for i in range(len(d)):
         for j in range(len(img)):
@@ -208,15 +205,20 @@ def punto_1_2(matrices_Imagenes, p, k):
             error[i,j] = error[i,j] * 100
 
     #agregar el signo de porcentaje en el eje y
+    #que sea cada 5 en el eje y
     plt.gca().yaxis.set_major_formatter(mticker.PercentFormatter())
+    plt.yticks(np.arange(0, 101, 5))
     #que el eje x sea de 1 en 1
-    plt.xticks(np.arange(1, 28, 2))
+    plt.xticks(np.arange(1, 16, 2))
     #plotear el error en un mismo grafico indicando la imagen en las leyendas
-    plt.title('Error de la compresión de cada imagen para d = 1, 2, ..., 27')
+    plt.title('Error de la compresión de cada imagen para d = 1, 2, ..., 15')
     #agregar malla al grafico
     plt.grid()
-    #printear la curva
-    plt.plot(d, error)
+    #printear la curva de error para cada imagen, cada marker diferente
+    plt.plot(d, error[:,0], marker='o')
+    plt.plot(d, error[:,1], marker='x')
+    plt.plot(d, error[:,2], marker='*')
+    plt.plot(d, error[:,3], marker='^')
     plt.xlabel('d')
     plt.ylabel('Error')
     plt.legend(['Imagen 1', 'Imagen 2', 'Imagen 3', 'Imagen 4'])
@@ -225,10 +227,10 @@ def punto_1_2(matrices_Imagenes, p, k):
    
 
 def main():
-    directorio = 'dataset_Imagenes'
+    directorio = 'dataset_imagenes'
     matrices_Imagenes = create_matrix_data(directorio)
     p = np.sqrt(matrices_Imagenes[:,0].shape[0]).astype(int)
-    # punto_1(matrices_Imagenes, p)
+    punto_1(matrices_Imagenes, p)
     
     """
     Dada una Imagen cualquiera del conjunto (por ejemplo la primera) encontrar d, el número mínimo
@@ -239,7 +241,7 @@ def main():
     """
     # Obtener la primera Imagen
     NumImagen = 6
-    punto_1_2(matrices_Imagenes, p, NumImagen)
+    # punto_1_2(matrices_Imagenes, p, NumImagen)
 
 
 
