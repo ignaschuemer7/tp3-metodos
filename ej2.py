@@ -116,6 +116,8 @@ def main():
     X_proyectado = PCA(X, 2)
     # print(X_proyectado.shape)
     plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1])
+    plt.title('PCA 2D')
+    plt.savefig('PCA_2D.svg', format='svg')
     plt.show()
 
     #usar Vt de la descomposicion en valores singulares para reducir la dimension de los datos, para hacer PCA
@@ -128,21 +130,21 @@ def main():
     # show_matrix(matriz_similaridades, 'Matriz de similaridades')
 
     #mostrar los clusters en dimension 2 por medio de kmeans
-    clusters = find_clusters(X_proyectado, 2)
+    # clusters = find_clusters(X_proyectado, 2)
     #corregir los clusters para que los puntos mas cercanos al centroide sean los del cluster cprrrespondiente
     #y los mas lejanos los del otro cluster
     #teniendo en cuenta la distancia de cada punto a cada centroide
 
-    plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1], c=clusters[:,0])
-    # # calcular el centroide de cada cluster
-    centroide1 = find_centroids(X_proyectado[clusters[:,0]==0,:])
-    centroide2 = find_centroids(X_proyectado[clusters[:,0]==1,:])
-    # show_clustering_data(X_proyectado, clusters[:,0], np.array([centroide1, centroide2]), 'Clustering con k-means')
-    print(centroide1)
-    print(centroide2)
-    plt.scatter(centroide1[0], centroide1[1], c='r', marker='x', s=100)
-    plt.scatter(centroide2[0], centroide2[1], c='r', marker='x', s=100) 
-    plt.show()
+    # plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1], c=clusters[:,0])
+    # # # calcular el centroide de cada cluster
+    # centroide1 = find_centroids(X_proyectado[clusters[:,0]==0,:])
+    # centroide2 = find_centroids(X_proyectado[clusters[:,0]==1,:])
+    # # show_clustering_data(X_proyectado, clusters[:,0], np.array([centroide1, centroide2]), 'Clustering con k-means')
+    # print(centroide1)
+    # print(centroide2)
+    # plt.scatter(centroide1[0], centroide1[1], c='r', marker='x', s=100)
+    # plt.scatter(centroide2[0], centroide2[1], c='r', marker='x', s=100) 
+    # plt.show()
 
     #clasificar las muestras 
     # clasificar(X_proyectado, [centroide1,centroide2], 1)
@@ -162,12 +164,15 @@ def main():
     # ax.scatter(X_reducido[:, 0], X_reducido[:, 1], X_reducido[:, 2])
     # plt.show()
 
-    #mostrar el dataset proyectado en el espacio de menor dimension, dimension 3
-    # X_proyectado = PCA(X, 3)
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111, projection='3d')
-    # ax.scatter(X_proyectado[:, 0], X_proyectado[:, 1], X_proyectado[:, 2])
-    # plt.show()
+    # mostrar el dataset proyectado en el espacio de menor dimension, dimension 3
+    X_proyectado = PCA(X, 3)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(X_proyectado[:, 0], X_proyectado[:, 1], X_proyectado[:, 2])
+    #agregar titulo
+    plt.title('PCA 3D')
+    plt.savefig('PCA_3D.svg', format='svg')
+    plt.show()
 
 if __name__ == "__main__":
     main()
