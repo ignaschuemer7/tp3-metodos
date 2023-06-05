@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
 
@@ -52,7 +53,7 @@ def find_clusters(X, n_clusters):
     Calcula los clusters a los que pertenece cada muestra de un dataset X_proyectado en un espacio de menor dimension
     """
     # Calcular la matriz de similaridades
-    matriz_similaridades = calcular_matriz_de_similaridades(X, 0.23)
+    matriz_similaridades = calcular_matriz_de_similaridades(X, 1.5)
     show_matrix(matriz_similaridades, 'Matriz de similaridades')
     # Calcular la matriz de grados
     matriz_grados = calcular_matriz_grados(matriz_similaridades)
@@ -74,6 +75,54 @@ def find_clusters(X, n_clusters):
             clusters[i,j] = np.linalg.norm(X[i,:] - autovectores[j,:])
         clusters[i,:] = np.argsort(clusters[i,:])
     return clusters
+
+def linear_kmeans(X, n_clusters, max_iterations=100):
+    # Inicialización de centroides
+    centroids = X[:n_clusters, :]
+
+    for _ in range(max_iterations):
+        # Asignación de muestras a los clusters más cercanos
+        distances = np.exp(-np.linalg.norm(X[:, np.newaxis] - centroids, axis=2)**2)
+        labels = np.argmax(distances, axis=1)
+        
+        # Actualización de los centroides
+        new_centroids = np.array([X[labels == k].mean(axis=0) for k in range(n_clusters)])
+
+        # Verificar convergencia
+        if np.all(centroids == new_centroids):
+            break
+
+        centroids = new_centroids
+    
+    return labels, centroids
+
+
+def spectral_clustering(X, n_clusters, sigma):
+    # Calcular la matriz de distancias
+    n = X.shape[0]
+    matriz_distancias = np.zeros((n,n))
+    for i in range(n):
+        for j in range(i+1, n):
+            matriz_distancias[i,j] = np.linalg.norm(X[i,:] - X[j,:])
+    matriz_distancias = matriz_distancias + matriz_distancias.T
+
+    # Calcular la matriz de similaridades utilizando la función de afinidad basada en la distancia euclidiana
+    matriz_similaridades = np.exp(-matriz_distancias**2 / (2 * sigma**2))
+
+    # Construir la matriz laplaciana
+    matriz_grados = np.diag(np.sum(matriz_similaridades, axis=1))
+    matriz_laplaciana = matriz_grados - matriz_similaridades
+
+    # Calcular la descomposición espectral de la matriz laplaciana sin normalizar
+    _, autovectores = np.linalg.eigh(matriz_laplaciana)
+
+    # Seleccionar los autovectores correspondientes a los k autovalores más pequeños
+    autovectores_seleccionados = autovectores[:, :n_clusters]
+
+    # Aplicar k-means a los autovectores para asignar las muestras a clusters
+    kmeans = linear_kmeans(autovectores_seleccionados, n_clusters)
+
+    return kmeans
 
 def show_matrix(A, title):
     """
@@ -131,11 +180,26 @@ def main():
 
     #mostrar los clusters en dimension 2 por medio de kmeans
     # clusters = find_clusters(X_proyectado, 2)
+    clusters, centroides = linear_kmeans(X_proyectado, 2)
+    plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1], c=clusters)
+    plt.scatter(centroides[:, 0], centroides[:, 1], marker='X', color='red', label='Centroides')
+    plt.title('Clustering con k-means')
+    # plt.savefig('kmeans.svg', format='svg')
+    plt.show()
+
+    clusters, centroides = spectral_clustering(X_proyectado, 2, 0.23)
+    plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1], c=clusters, cmap='viridis')
+    plt.title('Clustering con k-means')
+    # plt.savefig('kmeans.svg', format='svg')
+    plt.show()
+    # clusters = spectral_clustering(X_proyectado, 2, 0.23)
+    # print(clusters.shape)
     #corregir los clusters para que los puntos mas cercanos al centroide sean los del cluster cprrrespondiente
     #y los mas lejanos los del otro cluster
     #teniendo en cuenta la distancia de cada punto a cada centroide
 
-    # plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1], c=clusters[:,0])
+    # plt.scatter(X_proyectado[:, 0], X_proyectado[:, 1], c=clusters)
+    # plt.show()
     # # # calcular el centroide de cada cluster
     # centroide1 = find_centroids(X_proyectado[clusters[:,0]==0,:])
     # centroide2 = find_centroids(X_proyectado[clusters[:,0]==1,:])
@@ -165,14 +229,20 @@ def main():
     # plt.show()
 
     # mostrar el dataset proyectado en el espacio de menor dimension, dimension 3
-    X_proyectado = PCA(X, 3)
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(X_proyectado[:, 0], X_proyectado[:, 1], X_proyectado[:, 2])
-    #agregar titulo
-    plt.title('PCA 3D')
-    plt.savefig('PCA_3D.svg', format='svg')
-    plt.show()
+    # X_proyectado_3d = PCA(X, 3)
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
+    # ax.scatter(X_proyectado_3d[:, 0], X_proyectado_3d[:, 1], X_proyectado_3d[:, 2])
+    # plt.title('PCA 3D')
+    # plt.savefig('PCA_3D.svg', format='svg')
+    # plt.show()
+
+    # clusters_3d = spectral_clustering(X_proyectado_3d, 2, 0.23)
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
+    # ax.scatter(X_proyectado[:, 0], X_proyectado[:, 1], X_proyectado_3d[:, 2], c=clusters)
+    # plt.show()
+
 
 if __name__ == "__main__":
     main()

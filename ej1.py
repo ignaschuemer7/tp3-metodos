@@ -225,7 +225,7 @@ def punto_1_2(matrices_Imagenes, p, k):
    
 
 def main():
-    directorio = 'dataset_Imagenes'
+    directorio = 'dataset_imagenes'
     matrices_Imagenes = create_matrix_data(directorio)
     p = np.sqrt(matrices_Imagenes[:,0].shape[0]).astype(int)
     # punto_1(matrices_Imagenes, p)
