@@ -67,27 +67,45 @@ def main():
     X_original = np.loadtxt('dataset_clusters.csv', delimiter=',')
 
     # U,S,V = np.linalg.svd(X_original)
+    
+    # plt.plot(range(1, len(S)+1), S)
+    # plt.xlabel('Dimensión')
+    # plt.ylabel('Valor singular')
+    # plt.title('Valores singulares de X')
+    # plt.savefig('valores_singulares_todos.svg', format='svg')
+    # plt.show()
+
+    # #mismo grafico pero s desde 1 a 10
+    # plt.plot(range(1, len(S[0:10])+1), S[0:10], 'o')
+    # plt.xticks(np.arange(0, 11, 1))
+    # plt.xlabel('Dimensión')
+    # plt.ylabel('Valor singular 'r'$\sigma_i$')
+    # plt.title('Valores singulares de X')
+    # plt.savefig('valores_singulares_10.svg', format='svg')
+    # plt.show()
+
+
     # X = V[0:2,:]@X_original.T
     # #plot
     # plt.scatter(X[0,:],X[1,:])
     # plt.show()
-    # X = PCA(X_original,2)
+    X = PCA(X_original,2)
 
-    # # Parámetros de DBSCAN
-    # epsilon = 0.67
-    # min_muestras = 10
+    # Parámetros de DBSCAN
+    epsilon = 0.67
+    min_muestras = 10
 
-    # # Realizar el clustering con DBSCAN
-    # dbscan_data = dbscan(X, epsilon, min_muestras)
-    # # Graficar los clusters
-    # centroids = []
-    # for i in range(1, np.max(dbscan_data)):
-    #     centroids.append(np.mean(X[dbscan_data == i+1], axis=0))
-    # centroids = np.array(centroids)
+    # Realizar el clustering con DBSCAN
+    dbscan_data = dbscan(X, epsilon, min_muestras)
+    # Graficar los clusters
+    centroids = []
+    for i in range(1, np.max(dbscan_data)):
+        centroids.append(np.mean(X[dbscan_data == i+1], axis=0))
+    centroids = np.array(centroids)
 
-    # show_clustering_data(X, dbscan_data, centroids, title='DBSCAN 2D')
-    # distance_clasificator = find_subsets(X, centroids)
-    # show_clustering_data(X, distance_clasificator, centroids, title='Clasificador de datos por distancia a centroides')
+    show_clustering_data(X, dbscan_data, centroids, title='DBSCAN 2D')
+    distance_clasificator = find_subsets(X, centroids)
+    show_clustering_data(X, distance_clasificator, centroids, title='Clasificador de datos por distancia a centroides')
 
 
     # # Cargar el dataset (3 dimensiones)
@@ -117,22 +135,23 @@ def main():
     # plt.show()
 
     # Parámetros de DBSCAN para 4 dimensiones, luego hacemos un histograma para ver la distribución de los clusters	
-    epsilon_4d = 1.04
-    min_muestras_4d = 10
-    X_4d = PCA(X_original, 4)
-    # Realizar el clustering con DBSCAN para 4 dimensiones
-    labels_4d = dbscan(X_4d, epsilon_4d, min_muestras_4d)
-    print(np.max(labels_4d))
-    # Graficar los histogramas para poder visualisar aglomeramiento de datos, no podemos verlo en 4 dimensiones por eso hacemos un histograma
-    #graficar los histogramas de los clusters en una misma imagen
-    plt.figure()
-    for i in range(1, np.max(labels_4d)):
-        plt.hist(X_4d[labels_4d == i+1, 0], bins=20, alpha=0.5)  
-    plt.title('Densidad de la primera componente de los datos agrupados por clusters')
-    plt.xlabel('Componente 1')
-    plt.ylabel('Densidad de puntos')
-    plt.savefig('histograma_clusters.svg', format='svg')
-    plt.show()
+    # epsilon_4d = 1.04
+    # min_muestras_4d = 10
+    # X_4d = PCA(X_original, 5)
+    # # Realizar el clustering con DBSCAN para 4 dimensiones
+    # labels_4d = dbscan(X_4d, epsilon_4d, min_muestras_4d)
+    # print(np.max(labels_4d))
+    # # Graficar los histogramas para poder visualisar aglomeramiento de datos, no podemos verlo en 4 dimensiones por eso hacemos un histograma
+    # #graficar los histogramas de los clusters en una misma imagen
+    # plt.figure()
+    # for i in range(1, np.max(labels_4d)):
+    #     plt.hist(X_4d[labels_4d == i+1, 0], bins=20, alpha=0.5, label='Cluster {}'.format(i+1))  
+    # plt.legend()
+    # plt.title('Densidad de la primera componente de los datos agrupados por clusters')
+    # plt.xlabel('Componente 1')
+    # plt.ylabel('Densidad de puntos')
+    # plt.savefig('histograma_clusters.svg', format='svg')
+    # plt.show()
 
     #printear el histograma de la primer componente luego de hacer el pca sin la mascara
     # plt.figure()
